@@ -6,19 +6,25 @@ import { useRouter } from 'next/navigation'
 export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
+    setError('')
     
     // Simple hardcoded password check
     if (password === 'njmeRjLC') {
-      // Set a cookie or localStorage flag
+      // Set localStorage flag
       localStorage.setItem('mc-auth', 'true')
-      router.push('/')
-      router.refresh()
+      // Wait a moment then redirect
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 100)
     } else {
       setError('Invalid password')
+      setLoading(false)
     }
   }
 
@@ -35,6 +41,7 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter password"
             className="w-full px-4 py-2 bg-mc-bg text-mc-text rounded border border-mc-border focus:outline-none focus:border-mc-accent placeholder-mc-text-secondary"
+            disabled={loading}
             autoFocus
           />
           {error && (
@@ -42,9 +49,10 @@ export default function LoginPage() {
           )}
           <button
             type="submit"
-            className="w-full mt-4 bg-mc-accent hover:bg-mc-accent/90 text-mc-bg py-2 rounded font-medium transition-colors"
+            disabled={loading}
+            className="w-full mt-4 bg-mc-accent hover:bg-mc-accent/90 disabled:opacity-50 text-mc-bg py-2 rounded font-medium transition-colors"
           >
-            Login
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
       </div>
