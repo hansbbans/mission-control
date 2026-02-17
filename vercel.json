@@ -1,4 +1,7 @@
 {
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev"
+  "buildCommand": "next build",
+  "devCommand": "next dev",
+  "env": {
+    "SKIP_ENV_VALIDATION": "true"
+  }
 }

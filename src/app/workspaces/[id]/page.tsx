@@ -1,7 +1,5 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useWorkspace, useWorkspaceTasks, useWorkspaceAgents, useWorkspaceActivities } from '@/lib/convex';

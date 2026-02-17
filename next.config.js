@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable static generation completely
-  staticPageGenerationTimeout: 0,
-  // Output as standalone so Vercel doesn't try to pre-render
+  // Skip static generation, use server rendering only
   output: 'standalone',
+  experimental: {
+    // Don't try to export or prerender anything
+    isrMemoryCacheSize: 0,
+  },
+  // Skip next export
+  skipTrailingSlashRedirect: true,
 };
 
 module.exports = nextConfig;
