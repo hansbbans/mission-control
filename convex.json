@@ -1,0 +1,6 @@
+{
+  "authorizationHeader": "Authorization",
+  "functions": {
+    "dir": "convex"
+  }
+}

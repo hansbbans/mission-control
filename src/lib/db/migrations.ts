@@ -151,6 +151,31 @@ const migrations: Migration[] = [
         console.log('[Migration 004] Added planning_agents');
       }
     }
+  },
+  {
+    id: '005',
+    name: 'add_activities_table',
+    up: (db) => {
+      console.log('[Migration 005] Adding activities table...');
+      
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS activities (
+          id TEXT PRIMARY KEY,
+          type TEXT NOT NULL CHECK (type IN ('task', 'message', 'search', 'system', 'error')),
+          title TEXT NOT NULL,
+          description TEXT,
+          workspace_id TEXT DEFAULT 'default' REFERENCES workspaces(id),
+          metadata TEXT,
+          created_at TEXT DEFAULT (datetime('now'))
+        )
+      `);
+      
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_activities_created ON activities(created_at DESC)`);
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_activities_type ON activities(type)`);
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_activities_workspace ON activities(workspace_id)`);
+      
+      console.log('[Migration 005] Activities table created');
+    }
   }
 ];
 

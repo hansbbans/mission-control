@@ -174,4 +174,19 @@ CREATE INDEX IF NOT EXISTS idx_activities_task ON task_activities(task_id, creat
 CREATE INDEX IF NOT EXISTS idx_deliverables_task ON task_deliverables(task_id);
 CREATE INDEX IF NOT EXISTS idx_openclaw_sessions_task ON openclaw_sessions(task_id);
 CREATE INDEX IF NOT EXISTS idx_planning_questions_task ON planning_questions(task_id, sort_order);
+
+-- Activity feed table (for Mission Control dashboard)
+CREATE TABLE IF NOT EXISTS activities (
+  id TEXT PRIMARY KEY,
+  type TEXT NOT NULL CHECK (type IN ('task', 'message', 'search', 'system', 'error')),
+  title TEXT NOT NULL,
+  description TEXT,
+  workspace_id TEXT DEFAULT 'default' REFERENCES workspaces(id),
+  metadata TEXT,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_activities_created ON activities(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activities_type ON activities(type);
+CREATE INDEX IF NOT EXISTS idx_activities_workspace ON activities(workspace_id);
 `;
