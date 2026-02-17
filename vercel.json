@@ -1,15 +1,4 @@
 {
   "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "functions": {
-    "pages/api/**/*": {
-      "maxDuration": 30
-    }
-  }
+  "devCommand": "npm run dev"
 }
