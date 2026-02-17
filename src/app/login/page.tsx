@@ -1,7 +1,5 @@
 'use client'
 
-export const dynamic = 'force-dynamic';
-
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -13,13 +11,10 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
-    })
-
-    if (res.ok) {
+    // Simple hardcoded password check
+    if (password === 'njmeRjLC') {
+      // Set a cookie or localStorage flag
+      localStorage.setItem('mc-auth', 'true')
       router.push('/')
       router.refresh()
     } else {
@@ -28,10 +23,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-96">
-        <h1 className="text-2xl font-bold text-white mb-6 text-center">
-          Mission Control
+    <div className="min-h-screen flex items-center justify-center bg-mc-bg">
+      <div className="bg-mc-bg-secondary p-8 rounded-lg shadow-xl w-96 border border-mc-border">
+        <h1 className="text-3xl font-bold text-mc-text mb-6 text-center">
+          🦞 Mission Control
         </h1>
         <form onSubmit={handleSubmit}>
           <input
@@ -39,7 +34,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter password"
-            className="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
+            className="w-full px-4 py-2 bg-mc-bg text-mc-text rounded border border-mc-border focus:outline-none focus:border-mc-accent placeholder-mc-text-secondary"
             autoFocus
           />
           {error && (
@@ -47,7 +42,7 @@ export default function LoginPage() {
           )}
           <button
             type="submit"
-            className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-medium"
+            className="w-full mt-4 bg-mc-accent hover:bg-mc-accent/90 text-mc-bg py-2 rounded font-medium transition-colors"
           >
             Login
           </button>
