@@ -1,208 +1,168 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// Tasks
-export const createTask = mutation({
+// ==================== WORKSPACES ====================
+
+export const createWorkspace = mutation({
   args: {
-    title: v.string(),
-    description: v.string(),
-    assigneeIds: v.optional(v.array(v.id("agents"))),
-    dueDate: v.optional(v.number()),
+    name: v.string(),
+    description: v.optional(v.string()),
   },
   async handler(ctx, args) {
-    const taskId = await ctx.db.insert("tasks", {
-      title: args.title,
+    const workspaceId = await ctx.db.insert("workspaces", {
+      name: args.name,
       description: args.description,
-      status: "inbox",
-      assigneeIds: args.assigneeIds || [],
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      dueDate: args.dueDate,
+      created_at: Date.now(),
+    });
+    return workspaceId;
+  },
+});
+
+export const getWorkspaces = query({
+  async handler(ctx) {
+    return await ctx.db.query("workspaces").collect();
+  },
+});
+
+export const getWorkspace = query({
+  args: { workspaceId: v.id("workspaces") },
+  async handler(ctx, args) {
+    return await ctx.db.get(args.workspaceId);
+  },
+});
+
+// ==================== AGENTS ====================
+
+export const createAgent = mutation({
+  args: {
+    workspace_id: v.id("workspaces"),
+    name: v.string(),
+    role: v.string(),
+    description: v.optional(v.string()),
+    avatar_emoji: v.string(),
+    is_master: v.boolean(),
+    session_key: v.string(),
+  },
+  async handler(ctx, args) {
+    const agentId = await ctx.db.insert("agents", {
+      workspace_id: args.workspace_id,
+      name: args.name,
+      role: args.role,
+      description: args.description,
+      avatar_emoji: args.avatar_emoji,
+      status: "standby",
+      is_master: args.is_master,
+      session_key: args.session_key,
+      created_at: Date.now(),
+      updated_at: Date.now(),
+    });
+    return agentId;
+  },
+});
+
+export const getWorkspaceAgents = query({
+  args: { workspaceId: v.id("workspaces") },
+  async handler(ctx, args) {
+    return await ctx.db
+      .query("agents")
+      .filter((q) => q.eq(q.field("workspace_id"), args.workspaceId))
+      .collect();
+  },
+});
+
+export const updateAgentStatus = mutation({
+  args: {
+    agentId: v.id("agents"),
+    status: v.union(v.literal("standby"), v.literal("working"), v.literal("offline")),
+  },
+  async handler(ctx, args) {
+    await ctx.db.patch(args.agentId, {
+      status: args.status,
+      updated_at: Date.now(),
+    });
+  },
+});
+
+export const agentHeartbeat = mutation({
+  args: {
+    agentId: v.id("agents"),
+  },
+  async handler(ctx, args) {
+    const agent = await ctx.db.get(args.agentId);
+    if (!agent) return;
+
+    await ctx.db.patch(args.agentId, {
+      last_heartbeat: Date.now(),
+      status: "working",
     });
 
     // Log activity
     await ctx.db.insert("activities", {
+      workspace_id: agent.workspace_id,
+      type: "agent_status_changed",
+      agent_id: args.agentId,
+      message: `${agent.name} checked in`,
+      created_at: Date.now(),
+    });
+  },
+});
+
+// ==================== TASKS ====================
+
+export const createTask = mutation({
+  args: {
+    workspace_id: v.id("workspaces"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    priority: v.optional(v.union(
+      v.literal("low"),
+      v.literal("normal"),
+      v.literal("high"),
+      v.literal("urgent")
+    )),
+    assigned_agent_id: v.optional(v.id("agents")),
+  },
+  async handler(ctx, args) {
+    const taskId = await ctx.db.insert("tasks", {
+      workspace_id: args.workspace_id,
+      title: args.title,
+      description: args.description,
+      status: "planning",
+      priority: args.priority || "normal",
+      assigned_agent_id: args.assigned_agent_id,
+      created_at: Date.now(),
+      updated_at: Date.now(),
+    });
+
+    // Create conversation for task
+    await ctx.db.insert("conversations", {
+      workspace_id: args.workspace_id,
+      type: "task",
+      task_id: taskId,
+      created_at: Date.now(),
+      updated_at: Date.now(),
+    });
+
+    // Log activity
+    await ctx.db.insert("activities", {
+      workspace_id: args.workspace_id,
       type: "task_created",
-      taskId,
+      task_id: taskId,
       message: `Task created: ${args.title}`,
-      createdAt: Date.now(),
+      created_at: Date.now(),
     });
 
     return taskId;
   },
 });
 
-export const updateTaskStatus = mutation({
-  args: {
-    taskId: v.id("tasks"),
-    status: v.union(
-      v.literal("inbox"),
-      v.literal("assigned"),
-      v.literal("in_progress"),
-      v.literal("review"),
-      v.literal("done"),
-      v.literal("blocked")
-    ),
-  },
+export const getWorkspaceTasks = query({
+  args: { workspaceId: v.id("workspaces") },
   async handler(ctx, args) {
-    await ctx.db.patch(args.taskId, {
-      status: args.status,
-      updatedAt: Date.now(),
-    });
-
-    // Log activity
-    const task = await ctx.db.get(args.taskId);
-    await ctx.db.insert("activities", {
-      type: "task_status_changed",
-      taskId: args.taskId,
-      message: `Task status changed to: ${args.status}`,
-      createdAt: Date.now(),
-    });
-  },
-});
-
-export const assignTask = mutation({
-  args: {
-    taskId: v.id("tasks"),
-    agentIds: v.array(v.id("agents")),
-  },
-  async handler(ctx, args) {
-    await ctx.db.patch(args.taskId, {
-      assigneeIds: args.agentIds,
-      status: "assigned",
-      updatedAt: Date.now(),
-    });
-
-    // Notify agents
-    for (const agentId of args.agentIds) {
-      const agent = await ctx.db.get(agentId);
-      await ctx.db.insert("notifications", {
-        mentionedAgentId: agentId,
-        content: `You've been assigned a task`,
-        taskId: args.taskId,
-        delivered: false,
-        createdAt: Date.now(),
-      });
-    }
-  },
-});
-
-// Messages/Comments
-export const postMessage = mutation({
-  args: {
-    taskId: v.id("tasks"),
-    fromAgentId: v.id("agents"),
-    content: v.string(),
-    attachments: v.optional(v.array(v.id("documents"))),
-  },
-  async handler(ctx, args) {
-    const messageId = await ctx.db.insert("messages", {
-      taskId: args.taskId,
-      fromAgentId: args.fromAgentId,
-      content: args.content,
-      attachments: args.attachments || [],
-      createdAt: Date.now(),
-    });
-
-    // Log activity
-    const agent = await ctx.db.get(args.fromAgentId);
-    await ctx.db.insert("activities", {
-      type: "message_sent",
-      agentId: args.fromAgentId,
-      taskId: args.taskId,
-      message: `Message posted on task`,
-      createdAt: Date.now(),
-    });
-
-    // Handle @mentions
-    const mentionRegex = /@(\w+)/g;
-    const mentions = args.content.match(mentionRegex) || [];
-    
-    for (const mention of mentions) {
-      const agentName = mention.slice(1); // Remove @
-      const mentionedAgents = await ctx.db
-        .query("agents")
-        .filter((q) => q.eq(q.field("name"), agentName))
-        .collect();
-
-      for (const mentionedAgent of mentionedAgents) {
-        await ctx.db.insert("notifications", {
-          mentionedAgentId: mentionedAgent._id,
-          content: `@${mentionedAgent.name}: ${args.content.substring(0, 100)}...`,
-          taskId: args.taskId,
-          delivered: false,
-          createdAt: Date.now(),
-        });
-      }
-    }
-
-    return messageId;
-  },
-});
-
-// Documents
-export const createDocument = mutation({
-  args: {
-    title: v.string(),
-    content: v.string(),
-    type: v.union(
-      v.literal("deliverable"),
-      v.literal("research"),
-      v.literal("protocol"),
-      v.literal("notes")
-    ),
-    taskId: v.optional(v.id("tasks")),
-    createdBy: v.id("agents"),
-  },
-  async handler(ctx, args) {
-    const docId = await ctx.db.insert("documents", {
-      title: args.title,
-      content: args.content,
-      type: args.type,
-      taskId: args.taskId,
-      createdBy: args.createdBy,
-      createdAt: Date.now(),
-    });
-
-    // Log activity
-    await ctx.db.insert("activities", {
-      type: "document_created",
-      agentId: args.createdBy,
-      taskId: args.taskId,
-      message: `Document created: ${args.title}`,
-      createdAt: Date.now(),
-    });
-
-    return docId;
-  },
-});
-
-// Agent heartbeat
-export const agentHeartbeat = mutation({
-  args: {
-    agentId: v.id("agents"),
-  },
-  async handler(ctx, args) {
-    await ctx.db.patch(args.agentId, {
-      lastHeartbeat: Date.now(),
-      status: "active",
-    });
-
-    // Log activity
-    const agent = await ctx.db.get(args.agentId);
-    await ctx.db.insert("activities", {
-      type: "agent_heartbeat",
-      agentId: args.agentId,
-      message: `${agent.name} checked in`,
-      createdAt: Date.now(),
-    });
-  },
-});
-
-// Queries for frontend and agents
-export const getTasks = query({
-  async handler(ctx) {
-    return await ctx.db.query("tasks").collect();
+    return await ctx.db
+      .query("tasks")
+      .filter((q) => q.eq(q.field("workspace_id"), args.workspaceId))
+      .collect();
   },
 });
 
@@ -213,37 +173,151 @@ export const getTask = query({
   },
 });
 
-export const getTaskMessages = query({
-  args: { taskId: v.id("tasks") },
+export const updateTaskStatus = mutation({
+  args: {
+    taskId: v.id("tasks"),
+    status: v.union(
+      v.literal("planning"),
+      v.literal("inbox"),
+      v.literal("assigned"),
+      v.literal("in_progress"),
+      v.literal("testing"),
+      v.literal("review"),
+      v.literal("done")
+    ),
+  },
+  async handler(ctx, args) {
+    const task = await ctx.db.get(args.taskId);
+    if (!task) return;
+
+    await ctx.db.patch(args.taskId, {
+      status: args.status,
+      updated_at: Date.now(),
+    });
+
+    await ctx.db.insert("activities", {
+      workspace_id: task.workspace_id,
+      type: "task_status_changed",
+      task_id: args.taskId,
+      message: `Task status changed to: ${args.status}`,
+      created_at: Date.now(),
+    });
+  },
+});
+
+export const assignTask = mutation({
+  args: {
+    taskId: v.id("tasks"),
+    agentId: v.id("agents"),
+  },
+  async handler(ctx, args) {
+    const task = await ctx.db.get(args.taskId);
+    if (!task) return;
+
+    await ctx.db.patch(args.taskId, {
+      assigned_agent_id: args.agentId,
+      status: "assigned",
+      updated_at: Date.now(),
+    });
+
+    await ctx.db.insert("activities", {
+      workspace_id: task.workspace_id,
+      type: "task_assigned",
+      task_id: args.taskId,
+      agent_id: args.agentId,
+      message: `Task assigned to agent`,
+      created_at: Date.now(),
+    });
+
+    // Notify agent
+    await ctx.db.insert("notifications", {
+      workspace_id: task.workspace_id,
+      agent_id: args.agentId,
+      content: `You've been assigned a task: ${task.title}`,
+      task_id: args.taskId,
+      delivered: false,
+      created_at: Date.now(),
+    });
+  },
+});
+
+// ==================== MESSAGES ====================
+
+export const postMessage = mutation({
+  args: {
+    conversation_id: v.id("conversations"),
+    sender_agent_id: v.optional(v.id("agents")),
+    content: v.string(),
+  },
+  async handler(ctx, args) {
+    const conversation = await ctx.db.get(args.conversation_id);
+    if (!conversation) return;
+
+    const messageId = await ctx.db.insert("messages", {
+      conversation_id: args.conversation_id,
+      sender_agent_id: args.sender_agent_id,
+      content: args.content,
+      message_type: "text",
+      created_at: Date.now(),
+    });
+
+    // Log activity
+    await ctx.db.insert("activities", {
+      workspace_id: conversation.workspace_id,
+      type: "message_sent",
+      agent_id: args.sender_agent_id,
+      task_id: conversation.task_id,
+      message: `Message posted`,
+      created_at: Date.now(),
+    });
+
+    return messageId;
+  },
+});
+
+export const getConversationMessages = query({
+  args: { conversationId: v.id("conversations") },
   async handler(ctx, args) {
     return await ctx.db
       .query("messages")
-      .filter((q) => q.eq(q.field("taskId"), args.taskId))
+      .filter((q) => q.eq(q.field("conversation_id"), args.conversationId))
+      .order("asc")
       .collect();
   },
 });
 
-export const getActivities = query({
-  async handler(ctx) {
+export const getTaskConversation = query({
+  args: { taskId: v.id("tasks") },
+  async handler(ctx, args) {
+    const conversations = await ctx.db
+      .query("conversations")
+      .filter((q) => q.eq(q.field("task_id"), args.taskId))
+      .collect();
+    return conversations[0];
+  },
+});
+
+// ==================== ACTIVITIES ====================
+
+export const getWorkspaceActivities = query({
+  args: { workspaceId: v.id("workspaces") },
+  async handler(ctx, args) {
     return await ctx.db
       .query("activities")
+      .filter((q) => q.eq(q.field("workspace_id"), args.workspaceId))
       .order("desc")
       .take(100);
   },
 });
 
-export const getAgents = query({
-  async handler(ctx) {
-    return await ctx.db.query("agents").collect();
-  },
-});
+// ==================== NOTIFICATIONS ====================
 
 export const getAgentNotifications = query({
   args: { agentId: v.id("agents") },
   async handler(ctx, args) {
     return await ctx.db
       .query("notifications")
-      .filter((q) => q.eq(q.field("mentionedAgentId"), args.agentId))
+      .filter((q) => q.eq(q.field("agent_id"), args.agentId))
       .filter((q) => q.eq(q.field("delivered"), false))
       .collect();
   },

@@ -15,63 +15,34 @@ export type API = ApiFromModules<{
 
 export const api = null as unknown as {
   mutations: {
-    getTasks: {
-      (_: any): Promise<any>;
-    };
-    getTask: {
-      (_: { taskId: any }): Promise<any>;
-    };
-    getTaskMessages: {
-      (_: { taskId: any }): Promise<any[]>;
-    };
-    getActivities: {
-      (_: any): Promise<any[]>;
-    };
-    getAgents: {
-      (_: any): Promise<any[]>;
-    };
-    getAgentNotifications: {
-      (_: { agentId: any }): Promise<any[]>;
-    };
-    createTask: {
-      (_: {
-        title: string;
-        description: string;
-        assigneeIds?: any[];
-        dueDate?: number;
-      }): Promise<any>;
-    };
-    updateTaskStatus: {
-      (_: {
-        taskId: any;
-        status: "inbox" | "assigned" | "in_progress" | "review" | "done" | "blocked";
-      }): Promise<void>;
-    };
-    assignTask: {
-      (_: { taskId: any; agentIds: any[] }): Promise<void>;
-    };
-    postMessage: {
-      (_: {
-        taskId: any;
-        fromAgentId: any;
-        content: string;
-        attachments?: any[];
-      }): Promise<any>;
-    };
-    createDocument: {
-      (_: {
-        title: string;
-        content: string;
-        type: "deliverable" | "research" | "protocol" | "notes";
-        taskId?: any;
-        createdBy: any;
-      }): Promise<any>;
-    };
-    agentHeartbeat: {
-      (_: { agentId: any }): Promise<void>;
-    };
-    markNotificationDelivered: {
-      (_: { notificationId: any }): Promise<void>;
-    };
+    // Workspaces
+    getWorkspaces: { (_: any): Promise<any[]> };
+    getWorkspace: { (_: { workspaceId: any }): Promise<any> };
+    createWorkspace: { (_: { name: string; description?: string }): Promise<any> };
+
+    // Agents
+    getWorkspaceAgents: { (_: { workspaceId: any }): Promise<any[]> };
+    createAgent: { (_: any): Promise<any> };
+    updateAgentStatus: { (_: any): Promise<void> };
+    agentHeartbeat: { (_: { agentId: any }): Promise<void> };
+
+    // Tasks
+    getWorkspaceTasks: { (_: { workspaceId: any }): Promise<any[]> };
+    getTask: { (_: { taskId: any }): Promise<any> };
+    createTask: { (_: any): Promise<any> };
+    updateTaskStatus: { (_: any): Promise<void> };
+    assignTask: { (_: any): Promise<void> };
+
+    // Messages
+    getConversationMessages: { (_: { conversationId: any }): Promise<any[]> };
+    getTaskConversation: { (_: { taskId: any }): Promise<any> };
+    postMessage: { (_: any): Promise<any> };
+
+    // Activities
+    getWorkspaceActivities: { (_: { workspaceId: any }): Promise<any[]> };
+
+    // Notifications
+    getAgentNotifications: { (_: { agentId: any }): Promise<any[]> };
+    markNotificationDelivered: { (_: { notificationId: any }): Promise<void> };
   };
 };

@@ -6,9 +6,42 @@ import { api } from "../../convex/_generated/api";
  * These replace the old SQLite calls throughout the app
  */
 
-// Tasks
-export const useTasks = () => {
-  return useQuery(api.mutations.getTasks);
+// ==================== WORKSPACES ====================
+
+export const useWorkspaces = () => {
+  return useQuery(api.mutations.getWorkspaces);
+};
+
+export const useWorkspace = (workspaceId: string) => {
+  return useQuery(api.mutations.getWorkspace, workspaceId ? { workspaceId: workspaceId as any } : "skip");
+};
+
+export const useCreateWorkspace = () => {
+  return useMutation(api.mutations.createWorkspace);
+};
+
+// ==================== AGENTS ====================
+
+export const useWorkspaceAgents = (workspaceId: string) => {
+  return useQuery(api.mutations.getWorkspaceAgents, workspaceId ? { workspaceId: workspaceId as any } : "skip");
+};
+
+export const useCreateAgent = () => {
+  return useMutation(api.mutations.createAgent);
+};
+
+export const useUpdateAgentStatus = () => {
+  return useMutation(api.mutations.updateAgentStatus);
+};
+
+export const useAgentHeartbeat = () => {
+  return useMutation(api.mutations.agentHeartbeat);
+};
+
+// ==================== TASKS ====================
+
+export const useWorkspaceTasks = (workspaceId: string) => {
+  return useQuery(api.mutations.getWorkspaceTasks, workspaceId ? { workspaceId: workspaceId as any } : "skip");
 };
 
 export const useTask = (taskId: string) => {
@@ -27,35 +60,28 @@ export const useAssignTask = () => {
   return useMutation(api.mutations.assignTask);
 };
 
-// Messages
-export const useTaskMessages = (taskId: string) => {
-  return useQuery(api.mutations.getTaskMessages, taskId ? { taskId: taskId as any } : "skip");
+// ==================== MESSAGES ====================
+
+export const useConversationMessages = (conversationId: string) => {
+  return useQuery(api.mutations.getConversationMessages, conversationId ? { conversationId: conversationId as any } : "skip");
+};
+
+export const useTaskConversation = (taskId: string) => {
+  return useQuery(api.mutations.getTaskConversation, taskId ? { taskId: taskId as any } : "skip");
 };
 
 export const usePostMessage = () => {
   return useMutation(api.mutations.postMessage);
 };
 
-// Documents
-export const useCreateDocument = () => {
-  return useMutation(api.mutations.createDocument);
+// ==================== ACTIVITIES ====================
+
+export const useWorkspaceActivities = (workspaceId: string) => {
+  return useQuery(api.mutations.getWorkspaceActivities, workspaceId ? { workspaceId: workspaceId as any } : "skip");
 };
 
-// Activity
-export const useActivities = () => {
-  return useQuery(api.mutations.getActivities);
-};
+// ==================== NOTIFICATIONS ====================
 
-// Agents
-export const useAgents = () => {
-  return useQuery(api.mutations.getAgents);
-};
-
-export const useAgentHeartbeat = () => {
-  return useMutation(api.mutations.agentHeartbeat);
-};
-
-// Notifications
 export const useAgentNotifications = (agentId: string) => {
   return useQuery(api.mutations.getAgentNotifications, agentId ? { agentId: agentId as any } : "skip");
 };
