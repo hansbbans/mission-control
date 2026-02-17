@@ -3,6 +3,8 @@
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 
+export const dynamic = 'force-dynamic';
+
 const WorkspaceDashboard = dynamic(() => import('@/components/WorkspaceDashboard').then(mod => ({ default: mod.WorkspaceDashboard })), {
   loading: () => (
     <div className="min-h-screen bg-mc-bg flex items-center justify-center">
