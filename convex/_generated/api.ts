@@ -13,36 +13,36 @@ export type API = ApiFromModules<{
   mutations: typeof mutations;
 }>;
 
-export const api = null as unknown as {
+export const api = {
   mutations: {
     // Workspaces
-    getWorkspaces: { (_: any): Promise<any[]> };
-    getWorkspace: { (_: { workspaceId: any }): Promise<any> };
-    createWorkspace: { (_: { name: string; description?: string }): Promise<any> };
+    getWorkspaces: { _type: 'query' } as any,
+    getWorkspace: { _type: 'query' } as any,
+    createWorkspace: { _type: 'mutation' } as any,
 
     // Agents
-    getWorkspaceAgents: { (_: { workspaceId: any }): Promise<any[]> };
-    createAgent: { (_: any): Promise<any> };
-    updateAgentStatus: { (_: any): Promise<void> };
-    agentHeartbeat: { (_: { agentId: any }): Promise<void> };
+    getWorkspaceAgents: { _type: 'query' } as any,
+    createAgent: { _type: 'mutation' } as any,
+    updateAgentStatus: { _type: 'mutation' } as any,
+    agentHeartbeat: { _type: 'mutation' } as any,
 
     // Tasks
-    getWorkspaceTasks: { (_: { workspaceId: any }): Promise<any[]> };
-    getTask: { (_: { taskId: any }): Promise<any> };
-    createTask: { (_: any): Promise<any> };
-    updateTaskStatus: { (_: any): Promise<void> };
-    assignTask: { (_: any): Promise<void> };
+    getWorkspaceTasks: { _type: 'query' } as any,
+    getTask: { _type: 'query' } as any,
+    createTask: { _type: 'mutation' } as any,
+    updateTaskStatus: { _type: 'mutation' } as any,
+    assignTask: { _type: 'mutation' } as any,
 
     // Messages
-    getConversationMessages: { (_: { conversationId: any }): Promise<any[]> };
-    getTaskConversation: { (_: { taskId: any }): Promise<any> };
-    postMessage: { (_: any): Promise<any> };
+    getConversationMessages: { _type: 'query' } as any,
+    getTaskConversation: { _type: 'query' } as any,
+    postMessage: { _type: 'mutation' } as any,
 
     // Activities
-    getWorkspaceActivities: { (_: { workspaceId: any }): Promise<any[]> };
+    getWorkspaceActivities: { _type: 'query' } as any,
 
     // Notifications
-    getAgentNotifications: { (_: { agentId: any }): Promise<any[]> };
-    markNotificationDelivered: { (_: { notificationId: any }): Promise<void> };
-  };
-};
+    getAgentNotifications: { _type: 'query' } as any,
+    markNotificationDelivered: { _type: 'mutation' } as any,
+  },
+} as any;

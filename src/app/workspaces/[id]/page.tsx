@@ -1,14 +1,19 @@
 'use client';
 
+import { useState } from 'react';
+
+export const dynamic = 'force-dynamic';
 import { useParams } from 'next/navigation';
 import { useWorkspace, useWorkspaceTasks, useWorkspaceAgents, useWorkspaceActivities } from '@/lib/convex';
 import { TaskBoard } from '@/components/TaskBoard';
 import { ActivityLog } from '@/components/ActivityLog';
 import { AgentsSidebar } from '@/components/AgentsSidebar';
+import { AgentModal } from '@/components/AgentModal';
 
 export default function WorkspacePage() {
   const params = useParams();
   const workspaceId = params.id as string;
+  const [showAgentModal, setShowAgentModal] = useState(false);
 
   const workspace = useWorkspace(workspaceId);
   const tasks = useWorkspaceTasks(workspaceId);
@@ -29,7 +34,7 @@ export default function WorkspacePage() {
   return (
     <div className="min-h-screen bg-mc-bg flex">
       {/* Sidebar with agents */}
-      <AgentsSidebar agents={agents} workspaceId={workspaceId} />
+      <AgentsSidebar agents={agents} workspaceId={workspaceId} onAddAgent={() => setShowAgentModal(true)} />
 
       {/* Main content */}
       <div className="flex-1 flex flex-col">
@@ -56,6 +61,9 @@ export default function WorkspacePage() {
           </div>
         </main>
       </div>
+
+      {/* Agent modal */}
+      {showAgentModal && <AgentModal workspaceId={workspaceId} onClose={() => setShowAgentModal(false)} />}
     </div>
   );
 }

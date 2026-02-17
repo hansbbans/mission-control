@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+
+const mutations = (api.mutations as any);
 
 /**
  * Convex hooks wrapper
@@ -9,83 +12,83 @@ import { api } from "../../convex/_generated/api";
 // ==================== WORKSPACES ====================
 
 export const useWorkspaces = () => {
-  return useQuery(api.mutations.getWorkspaces);
+  return useQuery(mutations.getWorkspaces);
 };
 
 export const useWorkspace = (workspaceId: string) => {
-  return useQuery(api.mutations.getWorkspace, workspaceId ? { workspaceId: workspaceId as any } : "skip");
+  return useQuery(mutations.getWorkspace, workspaceId ? { workspaceId: workspaceId as any } : "skip");
 };
 
 export const useCreateWorkspace = () => {
-  return useMutation(api.mutations.createWorkspace);
+  return useMutation(mutations.createWorkspace);
 };
 
 // ==================== AGENTS ====================
 
 export const useWorkspaceAgents = (workspaceId: string) => {
-  return useQuery(api.mutations.getWorkspaceAgents, workspaceId ? { workspaceId: workspaceId as any } : "skip");
+  return useQuery(mutations.getWorkspaceAgents, workspaceId ? { workspaceId: workspaceId as any } : "skip");
 };
 
 export const useCreateAgent = () => {
-  return useMutation(api.mutations.createAgent);
+  return useMutation(mutations.createAgent);
 };
 
 export const useUpdateAgentStatus = () => {
-  return useMutation(api.mutations.updateAgentStatus);
+  return useMutation(mutations.updateAgentStatus);
 };
 
 export const useAgentHeartbeat = () => {
-  return useMutation(api.mutations.agentHeartbeat);
+  return useMutation(mutations.agentHeartbeat);
 };
 
 // ==================== TASKS ====================
 
 export const useWorkspaceTasks = (workspaceId: string) => {
-  return useQuery(api.mutations.getWorkspaceTasks, workspaceId ? { workspaceId: workspaceId as any } : "skip");
+  return useQuery(mutations.getWorkspaceTasks, workspaceId ? { workspaceId: workspaceId as any } : "skip");
 };
 
 export const useTask = (taskId: string) => {
-  return useQuery(api.mutations.getTask, taskId ? { taskId: taskId as any } : "skip");
+  return useQuery(mutations.getTask, taskId ? { taskId: taskId as any } : "skip");
 };
 
 export const useCreateTask = () => {
-  return useMutation(api.mutations.createTask);
+  return useMutation(mutations.createTask);
 };
 
 export const useUpdateTaskStatus = () => {
-  return useMutation(api.mutations.updateTaskStatus);
+  return useMutation(mutations.updateTaskStatus);
 };
 
 export const useAssignTask = () => {
-  return useMutation(api.mutations.assignTask);
+  return useMutation(mutations.assignTask);
 };
 
 // ==================== MESSAGES ====================
 
 export const useConversationMessages = (conversationId: string) => {
-  return useQuery(api.mutations.getConversationMessages, conversationId ? { conversationId: conversationId as any } : "skip");
+  return useQuery(mutations.getConversationMessages, conversationId ? { conversationId: conversationId as any } : "skip");
 };
 
 export const useTaskConversation = (taskId: string) => {
-  return useQuery(api.mutations.getTaskConversation, taskId ? { taskId: taskId as any } : "skip");
+  return useQuery(mutations.getTaskConversation, taskId ? { taskId: taskId as any } : "skip");
 };
 
 export const usePostMessage = () => {
-  return useMutation(api.mutations.postMessage);
+  return useMutation(mutations.postMessage);
 };
 
 // ==================== ACTIVITIES ====================
 
 export const useWorkspaceActivities = (workspaceId: string) => {
-  return useQuery(api.mutations.getWorkspaceActivities, workspaceId ? { workspaceId: workspaceId as any } : "skip");
+  return useQuery(mutations.getWorkspaceActivities, workspaceId ? { workspaceId: workspaceId as any } : "skip");
 };
 
 // ==================== NOTIFICATIONS ====================
 
 export const useAgentNotifications = (agentId: string) => {
-  return useQuery(api.mutations.getAgentNotifications, agentId ? { agentId: agentId as any } : "skip");
+  return useQuery(mutations.getAgentNotifications, agentId ? { agentId: agentId as any } : "skip");
 };
 
 export const useMarkNotificationDelivered = () => {
-  return useMutation(api.mutations.markNotificationDelivered);
+  return useMutation(mutations.markNotificationDelivered);
 };

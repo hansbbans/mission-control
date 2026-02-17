@@ -139,7 +139,28 @@ export interface OpenClawSession {
   updated_at: string;
 }
 
-export type ActivityType = 'spawned' | 'updated' | 'completed' | 'file_created' | 'status_changed';
+export type ActivityType = 
+  | 'task_created'
+  | 'task_assigned'
+  | 'task_status_changed'
+  | 'task_completed'
+  | 'message_sent'
+  | 'agent_status_changed'
+  | 'agent_joined'
+  | 'system';
+
+export interface Activity {
+  id: string;
+  workspace_id: string;
+  type: ActivityType;
+  agent_id?: string;
+  task_id?: string;
+  message: string;
+  metadata?: string;
+  created_at: number;
+}
+
+export type TaskActivityType = 'spawned' | 'updated' | 'completed' | 'file_created' | 'status_changed';
 
 export interface TaskActivity {
   id: string;

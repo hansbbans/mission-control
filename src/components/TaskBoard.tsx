@@ -17,6 +17,7 @@ export function TaskBoard({ tasks, workspaceId }: TaskBoardProps) {
   const updateTaskStatus = useUpdateTaskStatus();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,12 +36,24 @@ export function TaskBoard({ tasks, workspaceId }: TaskBoardProps) {
     }
   };
 
-  const handleDragEnd = async (taskId: string, newStatus: string) => {
+  const handleDragStart = (task: Task) => {
+    setDraggedTask(task);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent, newStatus: string) => {
+    e.preventDefault();
+    if (!draggedTask) return;
+
     try {
       await updateTaskStatus({
-        taskId: taskId as any,
+        taskId: draggedTask.id as any,
         status: newStatus as any,
       });
+      setDraggedTask(null);
     } catch (error) {
       console.error('Failed to update task status:', error);
     }
@@ -62,7 +75,12 @@ export function TaskBoard({ tasks, workspaceId }: TaskBoardProps) {
       {/* Kanban board */}
       <div className="grid grid-cols-7 gap-4">
         {STATUSES.map((status) => (
-          <div key={status} className="bg-mc-bg-secondary rounded-lg p-4 min-h-96">
+          <div
+            key={status}
+            className="bg-mc-bg-secondary rounded-lg p-4 min-h-96"
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, status)}
+          >
             <h3 className="font-semibold text-sm uppercase tracking-wide text-mc-text-secondary mb-4">
               {status}
             </h3>
@@ -73,8 +91,13 @@ export function TaskBoard({ tasks, workspaceId }: TaskBoardProps) {
                   <div
                     key={task.id}
                     draggable
-                    onDragEnd={() => handleDragEnd(task.id, status)}
-                    className="bg-mc-bg p-3 rounded-lg border border-mc-border cursor-move hover:border-mc-accent/50"
+                    onDragStart={() => handleDragStart(task)}
+                    onDragEnd={() => setDraggedTask(null)}
+                    className={`bg-mc-bg p-3 rounded-lg border cursor-move transition-all ${
+                      draggedTask?.id === task.id
+                        ? 'border-mc-accent/50 opacity-50'
+                        : 'border-mc-border hover:border-mc-accent/50'
+                    }`}
                   >
                     <p className="text-sm font-medium text-mc-text">{task.title}</p>
                     {task.description && (

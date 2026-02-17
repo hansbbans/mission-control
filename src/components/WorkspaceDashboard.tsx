@@ -84,7 +84,7 @@ export function WorkspaceDashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {workspaces.map((workspace) => (
+            {workspaces.map((workspace: any) => (
               <Link
                 key={workspace._id}
                 href={`/workspaces/${workspace._id}`}

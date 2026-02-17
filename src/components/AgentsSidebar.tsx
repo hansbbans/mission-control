@@ -1,19 +1,32 @@
 'use client';
 
+import { Plus } from 'lucide-react';
 import type { Agent } from '@/lib/types';
 
 interface AgentsSidebarProps {
   agents: Agent[];
   workspaceId: string;
+  onAddAgent?: () => void;
 }
 
-export function AgentsSidebar({ agents, workspaceId }: AgentsSidebarProps) {
+export function AgentsSidebar({ agents, workspaceId, onAddAgent }: AgentsSidebarProps) {
   return (
     <div className="w-64 bg-mc-bg-secondary border-r border-mc-border p-6 flex flex-col">
-      <h2 className="font-bold text-lg mb-6">Squad</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="font-bold text-lg">Squad</h2>
+        {onAddAgent && (
+          <button
+            onClick={onAddAgent}
+            className="p-1 hover:bg-mc-bg rounded-lg transition-colors"
+            title="Add agent"
+          >
+            <Plus className="w-4 h-4 text-mc-accent" />
+          </button>
+        )}
+      </div>
       <div className="space-y-3 flex-1">
         {agents.map((agent) => (
-          <div key={agent.id} className="p-3 bg-mc-bg rounded-lg border border-mc-border hover:border-mc-accent/50">
+          <div key={agent.id} className="p-3 bg-mc-bg rounded-lg border border-mc-border hover:border-mc-accent/50 transition-colors">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xl">{agent.avatar_emoji}</span>
               <span className="text-sm font-medium text-mc-text">{agent.name}</span>

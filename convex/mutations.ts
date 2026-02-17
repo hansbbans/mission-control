@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -8,7 +9,7 @@ export const createWorkspace = mutation({
     name: v.string(),
     description: v.optional(v.string()),
   },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     const workspaceId = await ctx.db.insert("workspaces", {
       name: args.name,
       description: args.description,
@@ -19,14 +20,14 @@ export const createWorkspace = mutation({
 });
 
 export const getWorkspaces = query({
-  async handler(ctx) {
+  async handler(ctx: any) {
     return await ctx.db.query("workspaces").collect();
   },
 });
 
 export const getWorkspace = query({
   args: { workspaceId: v.id("workspaces") },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     return await ctx.db.get(args.workspaceId);
   },
 });
@@ -43,7 +44,7 @@ export const createAgent = mutation({
     is_master: v.boolean(),
     session_key: v.string(),
   },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     const agentId = await ctx.db.insert("agents", {
       workspace_id: args.workspace_id,
       name: args.name,
@@ -62,10 +63,10 @@ export const createAgent = mutation({
 
 export const getWorkspaceAgents = query({
   args: { workspaceId: v.id("workspaces") },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     return await ctx.db
       .query("agents")
-      .filter((q) => q.eq(q.field("workspace_id"), args.workspaceId))
+      .filter((q: any) => q.eq(q.field("workspace_id"), args.workspaceId))
       .collect();
   },
 });
@@ -75,7 +76,7 @@ export const updateAgentStatus = mutation({
     agentId: v.id("agents"),
     status: v.union(v.literal("standby"), v.literal("working"), v.literal("offline")),
   },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     await ctx.db.patch(args.agentId, {
       status: args.status,
       updated_at: Date.now(),
@@ -87,7 +88,7 @@ export const agentHeartbeat = mutation({
   args: {
     agentId: v.id("agents"),
   },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     const agent = await ctx.db.get(args.agentId);
     if (!agent) return;
 
@@ -114,15 +115,12 @@ export const createTask = mutation({
     workspace_id: v.id("workspaces"),
     title: v.string(),
     description: v.optional(v.string()),
-    priority: v.optional(v.union(
-      v.literal("low"),
-      v.literal("normal"),
-      v.literal("high"),
-      v.literal("urgent")
-    )),
+    priority: v.optional(
+      v.union(v.literal("low"), v.literal("normal"), v.literal("high"), v.literal("urgent"))
+    ),
     assigned_agent_id: v.optional(v.id("agents")),
   },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     const taskId = await ctx.db.insert("tasks", {
       workspace_id: args.workspace_id,
       title: args.title,
@@ -158,17 +156,17 @@ export const createTask = mutation({
 
 export const getWorkspaceTasks = query({
   args: { workspaceId: v.id("workspaces") },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     return await ctx.db
       .query("tasks")
-      .filter((q) => q.eq(q.field("workspace_id"), args.workspaceId))
+      .filter((q: any) => q.eq(q.field("workspace_id"), args.workspaceId))
       .collect();
   },
 });
 
 export const getTask = query({
   args: { taskId: v.id("tasks") },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     return await ctx.db.get(args.taskId);
   },
 });
@@ -186,7 +184,7 @@ export const updateTaskStatus = mutation({
       v.literal("done")
     ),
   },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     const task = await ctx.db.get(args.taskId);
     if (!task) return;
 
@@ -210,7 +208,7 @@ export const assignTask = mutation({
     taskId: v.id("tasks"),
     agentId: v.id("agents"),
   },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     const task = await ctx.db.get(args.taskId);
     if (!task) return;
 
@@ -249,7 +247,7 @@ export const postMessage = mutation({
     sender_agent_id: v.optional(v.id("agents")),
     content: v.string(),
   },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     const conversation = await ctx.db.get(args.conversation_id);
     if (!conversation) return;
 
@@ -277,10 +275,10 @@ export const postMessage = mutation({
 
 export const getConversationMessages = query({
   args: { conversationId: v.id("conversations") },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     return await ctx.db
       .query("messages")
-      .filter((q) => q.eq(q.field("conversation_id"), args.conversationId))
+      .filter((q: any) => q.eq(q.field("conversation_id"), args.conversationId))
       .order("asc")
       .collect();
   },
@@ -288,10 +286,10 @@ export const getConversationMessages = query({
 
 export const getTaskConversation = query({
   args: { taskId: v.id("tasks") },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     const conversations = await ctx.db
       .query("conversations")
-      .filter((q) => q.eq(q.field("task_id"), args.taskId))
+      .filter((q: any) => q.eq(q.field("task_id"), args.taskId))
       .collect();
     return conversations[0];
   },
@@ -301,10 +299,10 @@ export const getTaskConversation = query({
 
 export const getWorkspaceActivities = query({
   args: { workspaceId: v.id("workspaces") },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     return await ctx.db
       .query("activities")
-      .filter((q) => q.eq(q.field("workspace_id"), args.workspaceId))
+      .filter((q: any) => q.eq(q.field("workspace_id"), args.workspaceId))
       .order("desc")
       .take(100);
   },
@@ -314,18 +312,18 @@ export const getWorkspaceActivities = query({
 
 export const getAgentNotifications = query({
   args: { agentId: v.id("agents") },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     return await ctx.db
       .query("notifications")
-      .filter((q) => q.eq(q.field("agent_id"), args.agentId))
-      .filter((q) => q.eq(q.field("delivered"), false))
+      .filter((q: any) => q.eq(q.field("agent_id"), args.agentId))
+      .filter((q: any) => q.eq(q.field("delivered"), false))
       .collect();
   },
 });
 
 export const markNotificationDelivered = mutation({
   args: { notificationId: v.id("notifications") },
-  async handler(ctx, args) {
+  async handler(ctx: any, args: any) {
     await ctx.db.patch(args.notificationId, {
       delivered: true,
     });
