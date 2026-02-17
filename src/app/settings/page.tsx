@@ -1,11 +1,11 @@
+'use client'
+
 export const dynamic = 'force-dynamic';
 
 /**
  * Settings Page
  * Configure Mission Control paths, URLs, and preferences
  */
-
-'use client'
 
 export default function SettingsPage() {
   return (
