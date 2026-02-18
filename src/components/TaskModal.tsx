@@ -21,10 +21,11 @@ export function TaskModal({ task, agents, onClose }: TaskModalProps) {
 
   const handleStatusChange = async (newStatus: string) => {
     try {
-      await updateTaskStatus({
-        taskId: task.id as any,
-        status: newStatus as any,
-      });
+      // TODO: Call updateTaskStatus when Convex is fixed
+      // await updateTaskStatus({
+      //   taskId: task.id as any,
+      //   status: newStatus as any,
+      // });
     } catch (error) {
       console.error('Failed to update status:', error);
     }
@@ -33,10 +34,11 @@ export function TaskModal({ task, agents, onClose }: TaskModalProps) {
   const handleAssignAgent = async (agentId: string) => {
     try {
       setSelectedAgent(agentId);
-      await assignTask({
-        taskId: task.id as any,
-        agentId: agentId as any,
-      });
+      // TODO: Call assignTask when Convex is fixed
+      // await assignTask({
+      //   taskId: task.id as any,
+      //   agentId: agentId as any,
+      // });
     } catch (error) {
       console.error('Failed to assign task:', error);
     }
