@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { useUpdateTaskStatus, useAssignTask } from '@/lib/convex';
+// import { useUpdateTaskStatus, useAssignTask } from '@/lib/convex';
 import type { Task, Agent } from '@/lib/types';
 
 interface TaskModalProps {
@@ -14,8 +14,9 @@ interface TaskModalProps {
 const STATUSES = ['planning', 'inbox', 'assigned', 'in_progress', 'testing', 'review', 'done'];
 
 export function TaskModal({ task, agents, onClose }: TaskModalProps) {
-  const updateTaskStatus = useUpdateTaskStatus();
-  const assignTask = useAssignTask();
+  // TODO: Re-enable when Convex is fixed
+  // const updateTaskStatus = useUpdateTaskStatus();
+  // const assignTask = useAssignTask();
   const [selectedAgent, setSelectedAgent] = useState<string>(task.assigned_agent_id || '');
 
   const handleStatusChange = async (newStatus: string) => {

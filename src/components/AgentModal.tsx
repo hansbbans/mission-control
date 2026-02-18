@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { useCreateAgent, useUpdateAgentStatus } from '@/lib/convex';
+// import { useCreateAgent, useUpdateAgentStatus } from '@/lib/convex';
 import type { Agent } from '@/lib/types';
 
 interface AgentModalProps {
@@ -14,7 +14,8 @@ interface AgentModalProps {
 const EMOJIS = ['🦞', '🐸', '🐙', '🦑', '🦐', '🐢', '🐠', '🦈', '🐙', '🦑'];
 
 export function AgentModal({ workspaceId, agent, onClose }: AgentModalProps) {
-  const createAgent = useCreateAgent();
+  // TODO: Re-enable when Convex is fixed
+  // const createAgent = useCreateAgent();
   const [name, setName] = useState(agent?.name || '');
   const [role, setRole] = useState(agent?.role || '');
   const [emoji, setEmoji] = useState(agent?.avatar_emoji || '🦞');
@@ -25,15 +26,16 @@ export function AgentModal({ workspaceId, agent, onClose }: AgentModalProps) {
     if (!name.trim() || !role.trim()) return;
 
     try {
-      await createAgent({
-        workspace_id: workspaceId as any,
-        name,
-        role,
-        avatar_emoji: emoji,
-        description: description || undefined,
-        is_master: false,
-        session_key: `agent:${name.toLowerCase()}:main`,
-      });
+      // TODO: Call createAgent when Convex is fixed
+      // await createAgent({
+      //   workspace_id: workspaceId as any,
+      //   name,
+      //   role,
+      //   avatar_emoji: emoji,
+      //   description: description || undefined,
+      //   is_master: false,
+      //   session_key: `agent:${name.toLowerCase()}:main`,
+      // });
       onClose();
     } catch (error) {
       console.error('Failed to create agent:', error);
