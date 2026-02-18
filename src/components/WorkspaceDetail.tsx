@@ -10,7 +10,7 @@ import { AgentModal } from '@/components/AgentModal';
 
 export function WorkspaceDetail() {
   const params = useParams();
-  const workspaceId = params.id as string;
+  const workspaceId = (params?.id as string) || '';
   const [showAgentModal, setShowAgentModal] = useState(false);
 
   // TODO: Re-enable when Convex is fixed
