@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useWorkspace, useWorkspaceTasks, useWorkspaceAgents, useWorkspaceActivities } from '@/lib/convex';
+// import { useWorkspace, useWorkspaceTasks, useWorkspaceAgents, useWorkspaceActivities } from '@/lib/convex';
 import { TaskBoard } from '@/components/TaskBoard';
 import { ActivityLog } from '@/components/ActivityLog';
 import { AgentsSidebar } from '@/components/AgentsSidebar';
@@ -13,10 +13,17 @@ export function WorkspaceDetail() {
   const workspaceId = params.id as string;
   const [showAgentModal, setShowAgentModal] = useState(false);
 
-  const workspace = useWorkspace(workspaceId);
-  const tasks = useWorkspaceTasks(workspaceId);
-  const agents = useWorkspaceAgents(workspaceId);
-  const activities = useWorkspaceActivities(workspaceId);
+  // TODO: Re-enable when Convex is fixed
+  // const workspace = useWorkspace(workspaceId);
+  // const tasks = useWorkspaceTasks(workspaceId);
+  // const agents = useWorkspaceAgents(workspaceId);
+  // const activities = useWorkspaceActivities(workspaceId);
+  
+  // Dummy data for now
+  const workspace = { _id: '1', name: 'Demo Workspace', description: 'Test' };
+  const tasks = [];
+  const agents = [];
+  const activities = [];
 
   if (!workspace || !tasks || !agents || !activities) {
     return (

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useCreateTask, useUpdateTaskStatus } from '@/lib/convex';
+// import { useCreateTask, useUpdateTaskStatus } from '@/lib/convex';
 import type { Task } from '@/lib/types';
 
 interface TaskBoardProps {
@@ -13,8 +13,9 @@ interface TaskBoardProps {
 const STATUSES = ['planning', 'inbox', 'assigned', 'in_progress', 'testing', 'review', 'done'];
 
 export function TaskBoard({ tasks, workspaceId }: TaskBoardProps) {
-  const createTask = useCreateTask();
-  const updateTaskStatus = useUpdateTaskStatus();
+  // TODO: Re-enable when Convex is fixed
+  // const createTask = useCreateTask();
+  // const updateTaskStatus = useUpdateTaskStatus();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
