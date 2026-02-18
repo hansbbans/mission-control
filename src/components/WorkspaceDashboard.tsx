@@ -3,11 +3,18 @@
 import { useState } from 'react';
 import { Plus, ArrowRight, Folder } from 'lucide-react';
 import Link from 'next/link';
-import { useWorkspaces, useCreateWorkspace } from '@/lib/convex';
+
+// Temporarily disabled Convex hooks - will fix connection
+// import { useWorkspaces, useCreateWorkspace } from '@/lib/convex';
 
 export function WorkspaceDashboard() {
-  const workspaces = useWorkspaces();
-  const createWorkspace = useCreateWorkspace();
+  // TODO: Re-enable when Convex is properly connected
+  // const workspaces = useWorkspaces();
+  // const createWorkspace = useCreateWorkspace();
+  
+  const [workspaces] = useState([
+    { _id: '1', name: 'Demo Workspace', description: 'Test workspace', created_at: Date.now() },
+  ]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
 
@@ -15,28 +22,10 @@ export function WorkspaceDashboard() {
     e.preventDefault();
     if (!newWorkspaceName.trim()) return;
 
-    try {
-      await createWorkspace({
-        name: newWorkspaceName,
-        description: '',
-      });
-      setNewWorkspaceName('');
-      setShowCreateModal(false);
-    } catch (error) {
-      console.error('Failed to create workspace:', error);
-    }
+    // TODO: Call createWorkspace mutation when Convex is ready
+    setNewWorkspaceName('');
+    setShowCreateModal(false);
   };
-
-  if (!workspaces) {
-    return (
-      <div className="min-h-screen bg-mc-bg flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4 animate-pulse">🦞</div>
-          <p className="text-mc-text-secondary">Loading workspaces...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-mc-bg">
