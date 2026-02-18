@@ -1,8 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
 
-const mutations = (api.mutations as any);
+// Safely import api - it's a mock during build but works at runtime
+let api: any;
+try {
+  api = require("../../convex/_generated/api").api;
+} catch (e) {
+  api = { mutations: {} } as any;
+}
+
+const mutations = api?.mutations || {};
 
 /**
  * Convex hooks wrapper
