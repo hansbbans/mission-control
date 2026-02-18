@@ -21,9 +21,9 @@ export function WorkspaceDetail() {
   
   // Dummy data for now
   const workspace = { _id: '1', name: 'Demo Workspace', description: 'Test' };
-  const tasks = [];
-  const agents = [];
-  const activities = [];
+  const tasks: any[] = [];
+  const agents: any[] = [];
+  const activities: any[] = [];
 
   if (!workspace || !tasks || !agents || !activities) {
     return (
