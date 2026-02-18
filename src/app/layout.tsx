@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { ConvexProviderComponent } from '@/components/ConvexProvider';
 
 export const metadata: Metadata = {
   title: 'Mission Control',
@@ -24,7 +23,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-mc-bg text-mc-text min-h-screen">
-        <ConvexProviderComponent>{children}</ConvexProviderComponent>
+        {children}
       </body>
     </html>
   );
